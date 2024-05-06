@@ -1,0 +1,6 @@
+uvicorn
+fastapi
+sqlalchemy~=2.0.29
+python-multipart
+pydantic~=2.7.1
+psycopg2
