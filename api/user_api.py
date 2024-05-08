@@ -9,7 +9,8 @@ user = APIRouter(prefix="/user")
 def registration(user_model: UserDto):
     print(f"{user_model} Hello ")
     user_data = dict(user_model)
-    phone_number = check_phone_number(user_model.phone_number)
+    print(user_data["phone_number"])
+    phone_number = check_phone_number(user_data["phone_number"])
     print(f"{phone_number} =================================================")
     if phone_number == True:
         reg_user = registration(**user_data)

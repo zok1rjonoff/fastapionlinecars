@@ -2,14 +2,6 @@ from sqlalchemy import Table, Column, Integer, ForeignKey, String, Text, DateTim
 from sqlalchemy.orm import relationship
 from database import Base
 
-# Define the association table for many-to-many relationship
-car_comment_association = Table(
-    'car_comment_association',
-    Base.metadata,
-    Column('car_id', Integer, ForeignKey('cars.id', ondelete="CASCADE")),
-    Column('comment_id', Integer, ForeignKey('comments.id', ondelete="CASCADE"))
-)
-
 
 class User(Base):
     __tablename__ = "users"
@@ -25,8 +17,9 @@ class User(Base):
 
 class Manufacturer(Base):
     __tablename__ = "manufacturer"
-    id = Column(Integer,autoincrement=True,primary_key=True)
+    id = Column(Integer, autoincrement=True, primary_key=True)
     manufacturer_name = Column(String, nullable=False, unique=True)
+    cars = relationship("Cars", back_populates="manufacturer_fk", lazy="subquery")
     created_at = Column(DateTime)
 
 
@@ -47,8 +40,8 @@ class Cars(Base):
     car_image = Column(String, nullable=False)
     car_created_at = Column(DateTime)
     # Establish one-to-many relationship with comments
-    comments = relationship("CarComment", secondary=car_comment_association, back_populates="cars", cascade="all, delete-orphan")
-    manufacturer_fk = relationship("CarManufacturer", lazy="subquery")
+    comments = relationship("CarComment", back_populates="car", cascade="all, delete-orphan")
+    manufacturer_fk = relationship("Manufacturer",back_populates="car",lazy="subquery")
     owner_fk = relationship("User", lazy="subquery")
 
 
@@ -56,10 +49,10 @@ class CarComment(Base):
     __tablename__ = "comments"
     id = Column(Integer, autoincrement=True, primary_key=True)
     user_id = Column(ForeignKey('users.id', ondelete="CASCADE"))
+    car_id = Column(ForeignKey("cars.id", ondelete="CASCADE"))
     comment = Column(Text, nullable=False)
     created_at = Column(DateTime)
     # Establish one-to-many relationship with users
     user = relationship("User", back_populates="comments")
     # Establish many-to-many relationship with cars
-    cars = relationship("Cars", secondary=car_comment_association, back_populates="comments")
-
+    car = relationship("Cars", back_populates="comments")
