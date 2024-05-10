@@ -1,4 +1,4 @@
-from sqlalchemy import Table, Column, Integer, ForeignKey, String, Text, DateTime, Boolean, Float
+from sqlalchemy import Column, Integer, ForeignKey, String, Text, DateTime, Boolean, Float
 from sqlalchemy.orm import relationship
 from database import Base
 
@@ -11,23 +11,26 @@ class User(Base):
     password = Column(String, nullable=False)
     is_admin = Column(Boolean, default=False)
     registration_date = Column(DateTime)
+    cars = relationship("Cars", back_populates="owner_fk", cascade="all, delete", passive_deletes=True, lazy="subquery")
     # Establish one-to-many relationship with comments
-    comments = relationship("CarComment", back_populates="user", cascade="all, delete-orphan")
+    comments = relationship("CarComment", back_populates="user", cascade="all, delete", passive_deletes=True,
+                            lazy="subquery")
 
 
 class Manufacturer(Base):
     __tablename__ = "manufacturer"
     id = Column(Integer, autoincrement=True, primary_key=True)
     manufacturer_name = Column(String, nullable=False, unique=True)
-    cars = relationship("Cars", back_populates="manufacturer_fk", lazy="subquery")
     created_at = Column(DateTime)
+
+    cars = relationship("Cars", back_populates="manufacturer_fk", passive_deletes=True, cascade="all, delete")
 
 
 class Cars(Base):
     __tablename__ = "cars"
     id = Column(Integer, autoincrement=True, nullable=False, primary_key=True)
-    manufacturer_id = Column(ForeignKey("manufacturer.id", ondelete="CASCADE"))
-    car_owner_id = Column(ForeignKey('users.id', ondelete="SET NULL"))
+    manufacturer_id = Column(ForeignKey("manufacturer.id"))
+    car_owner_id = Column(ForeignKey('users.id'))
     car_name = Column(String, nullable=False)
     car_year = Column(Integer, nullable=False)
     car_description = Column(Text, nullable=True)
@@ -40,9 +43,10 @@ class Cars(Base):
     car_image = Column(String, nullable=False)
     car_created_at = Column(DateTime)
     # Establish one-to-many relationship with comments
-    comments = relationship("CarComment", back_populates="car", cascade="all, delete-orphan")
-    manufacturer_fk = relationship("Manufacturer",back_populates="car",lazy="subquery")
-    owner_fk = relationship("User", lazy="subquery")
+    comments = relationship("CarComment", back_populates="cars", lazy="subquery", cascade="all, delete",
+                            passive_deletes=True)
+    manufacturer_fk = relationship("Manufacturer", lazy="subquery", back_populates="cars")
+    owner_fk = relationship("User", lazy="subquery", back_populates="cars")
 
 
 class CarComment(Base):
@@ -52,7 +56,9 @@ class CarComment(Base):
     car_id = Column(ForeignKey("cars.id", ondelete="CASCADE"))
     comment = Column(Text, nullable=False)
     created_at = Column(DateTime)
+
     # Establish one-to-many relationship with users
-    user = relationship("User", back_populates="comments")
+    user = relationship("User", back_populates="comments", lazy="subquery")
+
     # Establish many-to-many relationship with cars
-    car = relationship("Cars", back_populates="comments")
+    cars = relationship("Cars", back_populates="comments", lazy="subquery")

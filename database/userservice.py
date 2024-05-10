@@ -4,7 +4,7 @@ from models.models import User
 from datetime import datetime
 
 
-def registration(name, phone_number, password):
+def registration_db(name, phone_number, password, is_admin=False):
     db = next(get_db())
 
     new_user = User(name=name, phone_number=phone_number, password=password,
@@ -19,7 +19,6 @@ def check_phone_number(phone_number):
     pattern = r'^(\+998|998)\d{9}$'
     if re.match(pattern, phone_number):
         phone_number = db.query(User).filter_by(phone_number=phone_number).first()
-        print(F"{phone_number} ====USERSERVICE")
         if phone_number:
             return f"This {phone_number} phone number exist"
         else:
@@ -28,53 +27,55 @@ def check_phone_number(phone_number):
         return "Something wrong with this phone number "
 
 
-def make_admin(phone_number):
-    db = next(get_db())
+def make_admin_by_phone_number_db(phone_number):
+    print(phone_number)
     exist = db.query(User).filter_by(phone_number=phone_number).first()
     if exist:
         exist.is_admin = True
         db.commit()
-        return f"The user with this  {phone_number} is admin"
+        return True
     else:
-        return f"User with this {phone_number} is not found"
+        return False
 
 
-def make_admin_by_id(user_id):
+def make_admin_by_id_db(user_id):
+    print(user_id)
     db = next(get_db())
-    exist = db.query(User).filter_by(user_id=user_id).first()
+    exist = db.query(User).filter_by(id=user_id).first()
+    print(exist)
     if exist:
         exist.is_admin = True
         db.commit()
-        return f"The user with this  {user_id} is admin"
+        return True
     else:
-        return f"User with this {user_id} is not found"
+        return False
 
 
-def delete_user_by_phone_number(phone_number):
+def delete_user_by_phone_number_db(phone_number):
     db = next(get_db())
     exist = db.query(User).filter_by(phone_number=phone_number).first()
     if exist:
         db.delete(exist)
         db.commit()
-        return "User is deleted"
+        return True
     else:
-        return "User not found"
+        return False
 
 
-def delete_user_ny_id(user_id):
+def delete_user_by_id_db(user_id):
     db = next(get_db())
     exist = db.query(User).filter_by(user_id=user_id).first()
     if exist:
         db.delete(exist)
         db.commit()
-        return "User is deleted"
+        return True
     else:
-        return "User not found"
+        return False
 
 
-def change_user_info(user_id, changeable_info, new_data):
+def change_user_info_db(user_id, changeable_info, new_data):
     db = next(get_db())
-    user = db.query(User).filter_by(user_id=user_id).first()
+    user = db.query(User).filter_by(id=user_id).first()
     if user:
         if changeable_info == "name":
             user.name = new_data
@@ -84,5 +85,45 @@ def change_user_info(user_id, changeable_info, new_data):
             user.phone_number = new_data
             db.commit()
             return True
+        elif changeable_info == "password":
+            user.password = new_data
+            db.commit()
+            return True
     else:
-        return "User not found"
+        return False
+
+
+def get_all_user_from_db():
+    return next(get_db()).query(User).all()
+
+
+def get_user_by_id_db(id):
+    user = next(get_db()).query(User).filter_by(id=id).first()
+    return user if user else "Not found"
+
+
+def get_user_by_phone_number_db(phone_number):
+    user = next(get_db()).query(User).filter_by(phone_number=phone_number).first()
+    return user if user else "Not found"
+
+
+def delete_admin_by_phone_number_db(phone_number):
+    db = next(get_db())
+    exist = db.query(User).filter_by(phone_number=phone_number).first()
+    if exist:
+        exist.is_admin = False
+        db.commit()
+        return True
+    else:
+        return False
+
+
+def delete_admin_by_id_db(id):
+    db = next(get_db())
+    exist = db.query(User).filter_by(id=id).first()
+    if exist:
+        exist.is_admin = False
+        db.commit()
+        return True
+    else:
+        return False

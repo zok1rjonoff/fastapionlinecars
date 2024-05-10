@@ -41,14 +41,14 @@ def delete_manufacturer(id):
         return "Not found"
 
 
-def edit_manufacturer(id,name):
+def edit_manufacturer_db(id,name):
     db = next(get_db())
     exist = db.query(Manufacturer).filter_by(id=id).first()
     if exist:
         exist.manufacturer_name = name
         db.commit()
-        return "Edited"
+        return True
     else:
-        return "Not found"
+        return False
 
 

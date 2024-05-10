@@ -31,9 +31,17 @@ def get_by_id(id):
 
 
 @manufacturer.delete("/delete")
-def get_all():
-    list_manufacturer = get_all_manufacturer()
+def delete_by_id(id):
+    list_manufacturer = delete_manufacturer(id)
     if list_manufacturer:
         return {"status": 1, "message": list_manufacturer}
     else:
-        return {"status": 0, "message": "Empty"}
+        return {"status": 0, "message": list_manufacturer}
+
+
+@manufacturer.put("/update-manufacturer")
+def edit_manufacturer(id, name):
+    if edit_manufacturer_db(id, name):
+        return {"status": 1, "message": "Edited successfully"}
+    else:
+        return {"status": 0, "message": "Something went wrong "}
