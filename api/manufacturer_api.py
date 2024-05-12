@@ -45,3 +45,11 @@ def edit_manufacturer(id, name):
         return {"status": 1, "message": "Edited successfully"}
     else:
         return {"status": 0, "message": "Something went wrong "}
+
+
+# @manufacturer.get("/get-car-by-manufacturer-id")
+# def get_car_by_manufacturer_id(id):
+#     res = get_all_cars_by_manufacturer_id_db(id)
+#     if res != "Not found":
+#         return {"status": 1, "message": res}
+#     return {"status": 0, "message": res}

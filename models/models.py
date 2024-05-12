@@ -23,13 +23,13 @@ class Manufacturer(Base):
     manufacturer_name = Column(String, nullable=False, unique=True)
     created_at = Column(DateTime)
 
-    cars = relationship("Cars", back_populates="manufacturer_fk", passive_deletes=True, cascade="all, delete")
+    cars = relationship("Cars", back_populates="manufacturer_fk", cascade="all, delete")
 
 
 class Cars(Base):
     __tablename__ = "cars"
     id = Column(Integer, autoincrement=True, nullable=False, primary_key=True)
-    manufacturer_id = Column(ForeignKey("manufacturer.id"))
+    manufacturer_id = Column(ForeignKey("manufacturer.id", ondelete="CASCADE"))
     car_owner_id = Column(ForeignKey('users.id'))
     car_name = Column(String, nullable=False)
     car_year = Column(Integer, nullable=False)
@@ -52,8 +52,8 @@ class Cars(Base):
 class CarComment(Base):
     __tablename__ = "comments"
     id = Column(Integer, autoincrement=True, primary_key=True)
-    user_id = Column(ForeignKey('users.id', ondelete="CASCADE"))
-    car_id = Column(ForeignKey("cars.id", ondelete="CASCADE"))
+    user_id = Column(ForeignKey('users.id'))
+    car_id = Column(ForeignKey("cars.id"))
     comment = Column(Text, nullable=False)
     created_at = Column(DateTime)
 

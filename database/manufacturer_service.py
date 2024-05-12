@@ -1,5 +1,5 @@
 from database import get_db
-from models.models import Manufacturer
+from models.models import Manufacturer,Cars
 from datetime import datetime
 
 
@@ -50,5 +50,13 @@ def edit_manufacturer_db(id,name):
         return True
     else:
         return False
+
+
+# def get_all_cars_by_manufacturer_id_db(id):
+#     db = next(get_db())
+#     exist = db.query(Cars).filter_by(manufacturer_id = id).all()
+#     if exist:
+#         return exist
+#     return "Not found"
 
 

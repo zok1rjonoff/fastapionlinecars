@@ -1,10 +1,12 @@
 from database import get_db
 import re
+
+from dto.user_dto import UserDto
 from models.models import User
 from datetime import datetime
 
 
-def registration_db(name, phone_number, password, is_admin=False):
+def registration_db(name, phone_number, password):
     db = next(get_db())
 
     new_user = User(name=name, phone_number=phone_number, password=password,
@@ -15,6 +17,7 @@ def registration_db(name, phone_number, password, is_admin=False):
 
 
 def check_phone_number(phone_number):
+    print(phone_number)
     db = next(get_db())
     pattern = r'^(\+998|998)\d{9}$'
     if re.match(pattern, phone_number):
@@ -28,7 +31,7 @@ def check_phone_number(phone_number):
 
 
 def make_admin_by_phone_number_db(phone_number):
-    print(phone_number)
+    db = next(get_db())
     exist = db.query(User).filter_by(phone_number=phone_number).first()
     if exist:
         exist.is_admin = True
@@ -64,7 +67,7 @@ def delete_user_by_phone_number_db(phone_number):
 
 def delete_user_by_id_db(user_id):
     db = next(get_db())
-    exist = db.query(User).filter_by(user_id=user_id).first()
+    exist = db.query(User).filter_by(id=user_id).first()
     if exist:
         db.delete(exist)
         db.commit()
@@ -94,17 +97,22 @@ def change_user_info_db(user_id, changeable_info, new_data):
 
 
 def get_all_user_from_db():
-    return next(get_db()).query(User).all()
+    db = next(get_db())
+    users = db.query(User).all()
+    users_dto = [UserDto(id=user.id,name=user.name,phone_number=user.phone_number,password=user.password,is_admin=user.is_admin,created_at=user.registration_date) for user in users]
+    return users_dto
 
 
 def get_user_by_id_db(id):
     user = next(get_db()).query(User).filter_by(id=id).first()
-    return user if user else "Not found"
+    user_dto = UserDto(id=user.id,name=user.name,phone_number=user.phone_number,password=user.password,is_admin=user.is_admin,created_at=user.registration_date)
+    return user_dto if user_dto else "Not found"
 
 
 def get_user_by_phone_number_db(phone_number):
     user = next(get_db()).query(User).filter_by(phone_number=phone_number).first()
-    return user if user else "Not found"
+    user_dto = UserDto(id=user.id,name=user.name,phone_number=user.phone_number,password=user.password,is_admin=user.is_admin,created_at=user.registration_date)
+    return user_dto if user_dto else "Not found"
 
 
 def delete_admin_by_phone_number_db(phone_number):
