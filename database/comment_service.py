@@ -24,6 +24,7 @@ def get_user_comments_db(user_id):
     comments = db.query(CarComment).filter(CarComment.user_id == user_id).all()
     if comments:
         user_comments = [{
+            "id":comment.id,
             "user_id": user.id,
             "user_name": user.name,
             "car_id": comment.car_id,
@@ -45,7 +46,7 @@ def get_car_comments_db(car_id):
             "car_id": car.car_id,
             "car_name": db.query(Cars).filter_by(id=car_id).first().car_name,
             "user_id": car.user_id,
-            "user_name": db.query(User).filter_by(id=car.user_id).first().phone_number,
+            "user_name": db.query(User).filter_by(id=car.user_id).first().name,
             "comments": car.comment,
             "created_at": car.created_at
         } for car in comment]
